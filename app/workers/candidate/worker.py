@@ -36,7 +36,7 @@ def assign_candidate_task(task_id: int):
         raise ValueError(f"No users found for domain {domain}")
     
     # 3️⃣ Compute workload for each user
-    user_workload = []
+    min_user_workload = 'x', float("inf")
     for user in users:
         user_id = user["id"]
         tasks = db.fetch_all(
@@ -44,11 +44,14 @@ def assign_candidate_task(task_id: int):
             (user_id, domain),
         )
         total_hours = sum(t.get("estimated_hours", 0) for t in tasks)
-        user_workload.append((user_id, total_hours))
+        if total_hours == 0:
+            min_user_workload = (user_id, total_hours)
+            break
+        if total_hours < min_user_workload[1]:
+            min_user_workload = (user_id, total_hours)
 
     # 4️⃣ Select user with least workload
-    user_workload.sort(key=lambda x: x[1])
-    selected_user_id = user_workload[0][0]
+    selected_user_id = min_user_workload[0]
 
     # 5️⃣ Assign task to user
     db.execute(
