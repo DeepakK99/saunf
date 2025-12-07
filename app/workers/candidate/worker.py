@@ -59,7 +59,7 @@ def assign_candidate_task(task_id: int):
     user = next(u for u in users if u["id"] == selected_user_id)
 
     task_candidate_embed = {
-        "title": "🟢 Task Assigned",
+        "title": "🟢 Task Auto-assigned",
         "description": f"Task **{task_name}** has been assigned to you.",
         "color": 0x1abc9c,  # teal color for assigned tasks
         "fields": [
