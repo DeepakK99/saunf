@@ -2,11 +2,9 @@ package com.example.devtasks.controller;
 
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.*;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +28,9 @@ import jakarta.validation.Valid;
 public class TaskController {
     
     private final TaskService taskService;
+
+    @Value("${python.service.url}")
+    private String pythonUrl; 
 
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
@@ -73,7 +74,7 @@ public class TaskController {
 
     private void triggerPythonPipeline(Long taskId) {
         RestTemplate restTemplate = new RestTemplate();
-        String pythonUrl = "http://api:8000/tasks/process"; 
+
 
         Map<String, Object> payload = Map.of("task_id", taskId);
 

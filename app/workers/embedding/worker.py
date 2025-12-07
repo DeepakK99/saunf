@@ -54,7 +54,10 @@ def generate_embedding_task(task_id: int):
         user_webhook = db.fetch_one("select * from users where id=%s", (created_by,))
         webhook_url = user_webhook["discord_webhook"]
         if webhook_url:
-            message = f"Task {task_id} is optimised for semantic search"
-            send_discord_notification_task.delay(message, webhook_url) 
+            embedding_task_embed = {
+                "description": f"✅ Your task {task_id} is optimised for semantic search!",
+                "color": 0x3498db
+            }
+            send_discord_notification_task.delay(embedding_task_embed, webhook_url) 
 
     return {"task_id": task_id, "status": "embedding_updated"}

@@ -11,7 +11,7 @@ services:
       - redis
     ports:
       - "8080:8080"
-    restart: restart
+    restart: always
 
   api:
     build:

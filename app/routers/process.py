@@ -18,7 +18,7 @@ rag_helper = RAGHelperOllama(collection_name="tasks_vectors")
 @router.post("/process_task")
 async def process_task(request: TaskRequest):
     try:
-        task_id = request.taskId
+        task_id = request.task_id
         logger.info(f'Received request to process task: {task_id}')
         # Trigger background processing
         main_worker_task.delay(task_id)

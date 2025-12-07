@@ -17,6 +17,10 @@ spring:
         jdbc:
           time_zone: Asia/Kolkata
 
+python:
+  service:
+    url: ${PYTHON_SERVICE_URL}
+
 
 server:
   port: 8080

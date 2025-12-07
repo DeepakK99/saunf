@@ -24,6 +24,9 @@ def assign_candidate_task(task_id: int):
     if not task:
         raise ValueError(f"Task {task_id} not found")
 
+    task_name = task.get("title")
+    task_type = task.get("task_type")
+    priority = task.get("priority")
     domain = task.get("domain")
     hours_needed = task.get("estimated_hours", 1)
 
@@ -54,11 +57,21 @@ def assign_candidate_task(task_id: int):
 
     # 6️⃣ Optional: Notify user via Discord
     user = next(u for u in users if u["id"] == selected_user_id)
-    message = (
-        f"Task auto-assigned to you: {task['title']}\nDomain: {domain}\nHours: {hours_needed}"
-    )
-    webhook_url = user.get("discord_webhook")  # assume each user has webhook
+
+    task_candidate_embed = {
+        "title": "🟢 Task Assigned",
+        "description": f"Task **{task_name}** has been assigned to you.",
+        "color": 0x1abc9c,  # teal color for assigned tasks
+        "fields": [
+            {"name": "Task Name", "value": task_name, "inline": True},
+            {"name": "Task Type", "value": task_type, "inline": True},
+            {"name": "Priority", "value": priority, "inline": True},
+            {"name": "Domain", "value": domain, "inline": True},
+            {"name": "Estimation", "value": hours_needed, "inline": True}
+        ]
+    }
+    webhook_url = user.get("discord_webhook")
     if webhook_url:
-        send_discord_notification_task.delay(message, webhook_url)
+        send_discord_notification_task.delay(task_candidate_embed, webhook_url)
 
     return {"task_id": task_id, "assigned_to": selected_user_id}

@@ -68,10 +68,21 @@ def main_worker_task(task_id: int):
     user_webhook = db.fetch_one("SELECT discord_webhook FROM users WHERE id=%s", (created_by,))    
     webhook_url = user_webhook["discord_webhook"]
     # 4️ Trigger Discord notification
-    message = f"Your Task is Processed!\nTask processed: {task_name}\nDomain: {classification['domain']}\nPriority: {classification['priority']}\nTask type: {classification['task_type']}\nEstimation: {classification['estimated_hours']}hrs"
+    task_status_embed = {
+        "title": "📝 Task Processed",
+        "description": "Your task has been successfully processed.",
+        "color": 0x2ecc71,
+        "fields": [
+            {"name": "Task Name", "value": task_name, "inline": True},
+            {"name": "Domain", "value": classification["domain"], "inline": True},
+            {"name": "Priority", "value": classification["priority"], "inline": True},
+            {"name": "Task type", "value": classification["task_type"], "inline": True},
+            {"name": "Estimated Hrs", "value": classification["estimated_hours"], "inline": True}
+        ]
+    }
     if webhook_url:
+        send_discord_notification_task.delay(task_status_embed, webhook_url)
         logger.info(f'Notification for task {task_id}(main worker) scheduled')
-        send_discord_notification_task.delay(message, webhook_url)
 
     logger.info(f'Task {task_id} deligated to candidate worker')
     # find candidate and auto assign task
