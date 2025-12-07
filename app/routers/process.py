@@ -45,6 +45,8 @@ async def search_task(
     # Fetch full task info from DB for matched task_ids
     tasks = []
     for res in results:
+        if res["score"] < 0.5:
+            continue
         task_id = res["payload"]["task_id"]
         print(task_id)
         task_db = db.fetch_one("SELECT * FROM tasks WHERE id=%s", (task_id,))
