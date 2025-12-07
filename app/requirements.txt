@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+celery
+redis
+ollama
+requests
+pydantic
+qdrant_client==1.9.1
+pydantic-settings
+mysql-connector-python

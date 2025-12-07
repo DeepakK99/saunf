@@ -1,0 +1,12 @@
+# Build stage
+FROM maven:3.9.0-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY ./devtasks/pom.xml ./pom.xml
+COPY ./devtasks/src ./src
+RUN mvn clean package -DskipTests
+
+# Runtime stage
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=build /app/target/devtasks.jar ./devtasks.jar
+CMD ["java", "-jar", "devtasks.jar"]

@@ -1,0 +1,10 @@
+FROM python:3.11-slim
+
+WORKDIR /
+
+COPY ./app /app
+
+RUN pip install --no-cache-dir -r app/requirements.txt
+
+# command overridden in docker-compose
+CMD ["celery", "-A", "app.workers.main.worker", "worker", "--loglevel=info"]
