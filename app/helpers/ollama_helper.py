@@ -1,6 +1,7 @@
 from ollama import Client
 from app.config import settings
-
+from logger import get_logger
+logger = get_logger("ollama_helper")
 prompt = """
     Task: {task_name}
     Description: {task_description}
@@ -22,7 +23,7 @@ class OllamaClient:
 
     def __init__(self, host: str = settings.OLLAMA_HOST, model: str = settings.LLM_MODEL):
         # The SDK lets you specify a local or remote Ollama server
-        self.client = Client(host=host)
+        self.client = Client(host=host, timeout=120)
         self.model = model
         self.embedding_model = settings.EMBEDDING_MODEL
 
@@ -30,14 +31,18 @@ class OllamaClient:
         """
         Generate a non-streaming response from an LLM using the Ollama SDK.
         """
-        response = self.client.generate(
-            model=self.model,
-            prompt=prompt.format(**inputs),
-            options=options or {},
-        )
+        try:
+            response = self.client.generate(
+                model=self.model,
+                prompt=prompt.format(**inputs),
+                options=options or {},
+            )
 
-        # `response["response"]` contains the full model output
-        return response.get("response", "")
+            # response["response"] contains the full model output
+            return response.get("response", "")
+        except Exception as e:
+            logger.error(e.message())
+            return ""
     
     def generate_embedding(self, text: str):
         try:

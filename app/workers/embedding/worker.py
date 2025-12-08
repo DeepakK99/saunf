@@ -18,7 +18,16 @@ embedding_celery.conf.task_routes = {"generate_embedding_task": {"queue": "embed
 rag_helper = RAGHelperOllama(collection_name=settings.QDRANT_COLL_NAME)
 
 
-@embedding_celery.task(name="generate_embedding_task")
+@embedding_celery.task(name="generate_embedding_task",
+                    bind=True,
+                    autoretry_for=(Exception),
+                    retry_backoff=True,             # exponential backoff: 1s, 2s, 4s, ...
+                    retry_backoff_max=60,           # max delay between retries
+                    retry_jitter=True,              # randomize a bit to avoid thundering herd
+                    retry_kwargs={"max_retries": 3},# max retries
+                    soft_time_limit=40,             # per-task soft limit
+                    time_limit=50,                  # per-task hard limit
+                )
 def generate_embedding_task(task_id: int):
     """
     Generates embedding for task and updates Qdrant.

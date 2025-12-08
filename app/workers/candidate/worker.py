@@ -14,7 +14,16 @@ candidate_celery.conf.task_routes = {
 }
 
 
-@candidate_celery.task(name="assign_candidate_task")
+@candidate_celery.task(name="assign_candidate_task",
+                    bind=True,
+                    autoretry_for=(Exception),
+                    retry_backoff=True,             # exponential backoff: 1s, 2s, 4s, ...
+                    retry_backoff_max=60,           # max delay between retries
+                    retry_jitter=True,              # randomize a bit to avoid thundering herd
+                    retry_kwargs={"max_retries": 3},# max retries
+                    soft_time_limit=40,             # per-task soft limit
+                    time_limit=50,                  # per-task hard limit
+                )
 def assign_candidate_task(task_id: int):
     """
     Assigns the task to the most available user in the same domain.

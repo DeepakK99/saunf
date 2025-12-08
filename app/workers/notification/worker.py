@@ -12,7 +12,16 @@ notification_celery = Celery(
 notification_celery.conf.task_routes = {"send_discord_notification_task": {"queue": "notification_queue"}}
 
 
-@notification_celery.task(name="send_discord_notification_task")
+@notification_celery.task(name="send_discord_notification_task",
+                            bind=True,
+                            autoretry_for=(Exception),
+                            retry_backoff=True,             # exponential backoff: 1s, 2s, 4s, ...
+                            retry_backoff_max=60,           # max delay between retries
+                            retry_jitter=True,              # randomize a bit to avoid thundering herd
+                            retry_kwargs={"max_retries": 3},# max retries
+                            soft_time_limit=40,             # per-task soft limit
+                            time_limit=50,                  # per-task hard limit
+                        )
 def send_discord_notification_task(message_embed: dict, webhook_url: str):
     if not webhook_url.startswith("http"):
         raise ValueError(f"Invalid webhook URL: {webhook_url}")
