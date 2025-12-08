@@ -155,6 +155,7 @@ Make sure to **pull and run the required LLM and embedding models** before start
 ## 🧑‍💻 Author
 
 Built by **Deepak Kumar Sahu**
+
 Senior Software Engineer
 
 ---
