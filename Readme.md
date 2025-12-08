@@ -136,7 +136,8 @@ Make sure to **pull and run the required LLM and embedding models** before start
   * Trigger maintenance workflows
 
 * 🏛️ **Single Database Ownership via Spring Boot**  
-  Migrate all direct database access from Python services to **Spring Boot as the sole DB owner**, enforcing strict service boundaries and improving data integrity, security, and long-term maintainability.
+
+  * Migrate all direct database access from Python services to **Spring Boot as the sole DB owner**, enforcing strict service boundaries and improving data integrity, security, and long-term maintainability.
 
 
 ---
