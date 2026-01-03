@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Query
 
 from app.helpers.db_helper import db
-from app.helpers.rag_helper_ollama import RAGHelperOllama
+from app.helpers.rag_helper_ollama import rag_helper
 from app.logger import get_logger
 from app.schema.request_entities import TaskRequest
 from app.schema.task_response import TaskResponse
@@ -13,10 +13,6 @@ from app.workers.main.worker import main_worker_task
 logger = get_logger("fastapi")
 
 router = APIRouter(prefix="/process", tags=["Processing"])
-
-# Initialize RAG helper (Qdrant collection: tasks_vectors)
-rag_helper = RAGHelperOllama(collection_name="tasks_vectors")
-
 
 # post endpoint to start processing a task
 @router.post("/process_task")
@@ -57,7 +53,7 @@ async def search_task(
     """
     try:
         # Perform semantic search using RAG helper
-        results = rag_helper.search(query=query, limit=top_k)
+        results = rag_helper.search(query= query, limit= top_k)
 
         # Fetch full task info from DB for matched task_ids
         tasks = []

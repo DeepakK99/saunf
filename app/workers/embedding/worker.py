@@ -2,7 +2,7 @@ from celery import Celery
 
 from app.config import settings
 from app.helpers.db_helper import db
-from app.helpers.rag_helper_ollama import RAGHelperOllama
+from app.helpers.rag_helper_ollama import rag_helper
 from app.logger import get_logger
 from app.workers.notification.worker import send_discord_notification_task
 
@@ -18,14 +18,11 @@ embedding_celery.conf.task_routes = {
     "generate_embedding_task": {"queue": "embedding_queue"}
 }
 
-# Initialize RAG helper
-rag_helper = RAGHelperOllama(collection_name=settings.QDRANT_COLL_NAME)
-
 
 @embedding_celery.task(
     name="generate_embedding_task",
     bind=True,
-    autoretry_for=(Exception),
+    autoretry_for=(Exception,),
     retry_backoff=True,  # exponential backoff: 1s, 2s, 4s, ...
     retry_backoff_max=60,  # max delay between retries
     retry_jitter=True,  # randomize a bit to avoid thundering herd
@@ -33,7 +30,7 @@ rag_helper = RAGHelperOllama(collection_name=settings.QDRANT_COLL_NAME)
     soft_time_limit=40,  # per-task soft limit
     time_limit=50,  # per-task hard limit
 )
-def generate_embedding_task(task_id: int):
+def generate_embedding_task(self, task_id: int):
     """
     Generates embedding for task and updates Qdrant.
     Then triggers candidate assignment worker.
@@ -64,7 +61,7 @@ def generate_embedding_task(task_id: int):
     except Exception as e:
         logger.error(f"Qdrant error: {e}")
         raise e
-    
+
     # send Discord notification
     if created_by:
         user_webhook = db.fetch_one("select * from users where id=%s", (created_by,))

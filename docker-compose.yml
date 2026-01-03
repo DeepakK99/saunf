@@ -55,7 +55,7 @@ services:
       - qdrant
     restart: always
 
-  worker_candiate:
+  worker_candidate:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker

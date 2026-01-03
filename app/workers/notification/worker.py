@@ -6,7 +6,7 @@ from requests.exceptions import RequestException, HTTPError
 from celery import Celery
 
 from app.config import settings
-from logger import get_logger
+from app.logger import get_logger
 
 logger = get_logger("notification_celery")
 
@@ -34,7 +34,7 @@ notification_celery.conf.task_routes = {
     soft_time_limit=40,  # per-task soft limit
     time_limit=50,  # per-task hard limit
 )
-def send_discord_notification_task(message_embed: dict, webhook_url: str):
+def send_discord_notification_task(self, message_embed: dict, webhook_url: str):
     # avoid accidental non http url call
     if not webhook_url.startswith("http"):
         logger.warning(f"Invalid webhook URL: {webhook_url}")

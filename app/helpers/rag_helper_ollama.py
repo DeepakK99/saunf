@@ -91,7 +91,7 @@ class RAGHelperOllama:
         return [{"id": r.id, "score": r.score, "payload": r.payload} for r in results]
 
     # -------------------------
-    # Delete Document
+    # Delete Document (will add custom filter to delete later)
     # -------------------------
     def delete_document(self, doc_id: str):
         self.client.delete(
@@ -99,8 +99,11 @@ class RAGHelperOllama:
         )
 
     # -------------------------
-    # List all documents
+    # List all documents (will add custom filter to ls later)
     # -------------------------
     def list_documents(self, limit: int = 100) -> List[Dict]:
         results = self.client.scroll(collection_name=self.collection_name, limit=limit)
         return [{"id": r.id, "payload": r.payload} for r in results]
+
+# global rag helper
+rag_helper = RAGHelperOllama()

@@ -35,7 +35,7 @@ main_celery.conf.task_routes = {"main_worker_task": {"queue": "main_queue"}}
 @main_celery.task(
     name="main_worker_task",
     bind=True,
-    autoretry_for=(Exception),
+    autoretry_for=(Exception,),
     retry_backoff=True,  # exponential backoff: 1s, 2s, 4s, ...
     retry_backoff_max=60,  # max delay between retries
     retry_jitter=True,  # randomize a bit to avoid thundering herd

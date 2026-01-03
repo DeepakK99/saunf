@@ -1,6 +1,6 @@
 from ollama import Client
 from app.config import settings
-from logger import get_logger
+from app.logger import get_logger
 logger = get_logger("ollama_helper")
 prompt = """
     Task: {task_name}
@@ -12,7 +12,7 @@ prompt = """
         "task_type": "BUG/FEATURE/ENHANCEMENT/TESTING",
         "estimated_hours": 1/2/3/....
     }}
-    return json output only.
+    return json output only. Each key in the JSON can have ATMOST ONE value.
     """
 
 class OllamaClient:
@@ -21,11 +21,11 @@ class OllamaClient:
     Supports non-streaming responses.
     """
 
-    def __init__(self, host: str = settings.OLLAMA_HOST, model: str = settings.LLM_MODEL):
+    def __init__(self, host: str = settings.OLLAMA_HOST, llm_model: str = settings.LLM_MODEL, embedding_model: str = settings.EMBEDDING_MODEL):
         # The SDK lets you specify a local or remote Ollama server
         self.client = Client(host=host, timeout=120)
-        self.model = model
-        self.embedding_model = settings.EMBEDDING_MODEL
+        self.llm_model = llm_model
+        self.embedding_model = embedding_model
 
     def generate(self, inputs: dict[str]  , options: dict | None = None) -> str:
         """
@@ -33,7 +33,7 @@ class OllamaClient:
         """
         try:
             response = self.client.generate(
-                model=self.model,
+                model=self.llm_model,
                 prompt=prompt.format(**inputs),
                 options=options or {},
             )

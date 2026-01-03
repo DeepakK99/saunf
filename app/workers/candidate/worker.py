@@ -1,5 +1,5 @@
 from celery import Celery
-from logger import get_logger
+from app.logger import get_logger
 
 from app.config import settings
 from app.helpers.db_helper import db
@@ -21,7 +21,7 @@ candidate_celery.conf.task_routes = {
 @candidate_celery.task(
     name="assign_candidate_task",
     bind=True,
-    autoretry_for=(Exception),
+    autoretry_for=(Exception,),
     retry_backoff=True,  # exponential backoff: 1s, 2s, 4s, ...
     retry_backoff_max=60,  # max delay between retries
     retry_jitter=True,  # randomize a bit to avoid thundering herd
@@ -29,7 +29,7 @@ candidate_celery.conf.task_routes = {
     soft_time_limit=40,  # per-task soft limit
     time_limit=50,  # per-task hard limit
 )
-def assign_candidate_task(task_id: int):
+def assign_candidate_task(self, task_id: int):
     """
     Assigns the task to the most available user in the same domain.
     """
@@ -43,6 +43,7 @@ def assign_candidate_task(task_id: int):
     task_type = task.get("task_type")
     priority = task.get("priority")
     domain = task.get("domain")
+    created_by = task.get("created_by")
     hours_needed = task.get("estimated_hours", 1)
 
     # Fetch users in the same domain
@@ -60,10 +61,10 @@ def assign_candidate_task(task_id: int):
             (user_id, domain),
         )
         total_hours = sum(t.get("estimated_hours", 0) for t in tasks)
-        if total_hours == 0:
-            min_user_workload = (user_id, total_hours)
-            break
+
         if total_hours < min_user_workload[1]:
+            min_user_workload = (user_id, total_hours)
+        elif total_hours == min_user_workload[1] and str(user_id) == str(created_by): # assign to the task created person if possible
             min_user_workload = (user_id, total_hours)
 
     # Select user with least workload
