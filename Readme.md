@@ -1,6 +1,6 @@
 # 🚀 AI-Powered Task Classification & Auto-Assignment Backend
 
-A **backend-only, Jira-like task management system** that automatically **classifies, prioritizes, and assigns tasks using a local LLM**. Built with a **distributed, asynchronous microservice architecture** using Spring Boot, FastAPI, Celery, Redis, and Qdrant for semantic search.
+A **backend-only, task management system** that automatically **classifies, prioritizes, and assigns tasks using a local LLM**. Built with a **distributed, asynchronous microservice architecture** using Spring Boot, FastAPI, Celery, Redis, and Qdrant for semantic search.
 
 This project demonstrates **AI-driven automation**, **event-driven design**, and **scalable async processing** in a real-world backend system.
 
