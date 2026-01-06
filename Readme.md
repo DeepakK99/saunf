@@ -1,4 +1,4 @@
-# 🚀 AI-Powered Task Classification & Auto-Assignment Backend
+# 🚀 Asynchronous Task Processing Backend Backend
 
 A **backend-only, task management system** that automatically **classifies, prioritizes, and assigns tasks using a local LLM**. Built with a **distributed, asynchronous microservice architecture** using Spring Boot, FastAPI, Celery, Redis, and Qdrant for semantic search.
 
